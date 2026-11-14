@@ -29,7 +29,7 @@ Phase 1 läuft ab heute. Fest ist nur der Vortragstermin, die übrigen Daten sin
 
 ### Phase 3 · Proben und Überarbeitung · bis Nov 15, 2026
 
-- [ ] Erster Durchlauf allein mit Stoppuhr, auf 23 bis 24 Minuten kürzen
+- [ ] Erster Durchlauf allein mit Stoppuhr, Ziel rund 24 Minuten
 - [ ] Probevortrag vor ein bis zwei Leuten ohne Biologie-Vorwissen
 - [ ] Notieren, wo die Zuhörer hängen bleiben, und nachbessern
 - [ ] Antworten auf die erwartbaren Fragen laut üben
@@ -78,7 +78,7 @@ Kernbotschaft in einem Satz: CloudBurst macht hochsensitives Read-Mapping skalie
 ### Regeln für alle Folien
 
 - Eine Aussage pro Folie, als ganzer Satz im Titel.
-- Ein durchgehendes Mini-Beispiel (derselbe Read, dasselbe Genomstück) von Folie 6 bis 11.
+- Ein durchgehendes Mini-Beispiel (derselbe Read, dasselbe Genomstück) von Folie 8 bis 15.
 - Fester Farbcode in allen Grafiken, auch in neu gezeichneten Plots.
 - Biologie nur so weit wie nötig: DNA als Text aus A, C, G und T.
 - Zahlen runden und vergleichen: „14 Stunden → 8 Minuten“ statt „50.400 s“.
@@ -87,52 +87,66 @@ Kernbotschaft in einem Satz: CloudBurst macht hochsensitives Read-Mapping skalie
 
 ## Folienplan für 25 Minuten
 
-20 Folien füllen 23:30 Minuten und lassen 1:30 Minuten Puffer. Die Aufteilung orientiert sich an den Tipps-Folien, mit etwas mehr Raum für Grundlagen: Motivation 3 Folien, Grundlagen und Methode 8, Ergebnisse 4, Einordnung und Fazit 2.
+24 Folien füllen 24:10 Minuten und lassen 0:50 Minuten Puffer. Stand: überarbeiteter Foliensatz vom 14. November 2026. Die Aufteilung: Einstieg 4 Folien, Motivation 3, Grundlagen 5, Umsetzung 5, Ergebnisse 4, Einordnung und Schluss 3. Gegenüber dem ersten Plan sind zwei Grundlagenfolien dazugekommen: Edit-Distanz mit Landau-Vishkin (Folie 11) und die Laufzeit des Algorithmus (Folie 17).
 
 | Nr | Folientitel (Aussage) | Inhalt | Grafik | Dauer | Ende bei |
 | --- | --- | --- | --- | --- | --- |
-| 1 | CloudBurst: hochsensitives Read-Mapping mit MapReduce | Titel, Autor (M. C. Schatz, Bioinformatics 2009), dein Name, Seminar | – | 0:30 | 0:30 |
-| 2 | Überblick | Problem · Grundlagen · CloudBurst · Ergebnisse · Einordnung | Fortschrittsleiste, die auf jeder Folie mitläuft | 0:30 | 1:00 |
-| 3 | Sequenzierer liefern Millionen kurzer DNA-Schnipsel | Reads von 25 bis 250 bp, Genom mit rund 2,9 Mrd. Basen; für ein Genom wurden 4 Mrd. Reads à 35 bp kartiert (Bentley 2008) | Genom wird in viele Reads zerschnitten | 1:30 | 2:30 |
-| 4 | Read-Mapping sucht für jeden Read seine Stelle im Genom, trotz Fehlern | Mismatch und Indel · Ursachen: echte Varianten (SNPs) und Sequenzierfehler · Anwendungen: SNP-Suche, Genotypisierung | Read unter der Referenz, Mismatch und Indel markiert | 1:30 | 4:00 |
-| 5 | Mehr erlaubte Fehler machen die Suche drastisch langsamer | Schnelle Tools erlauben oft nur 2 Fehler und melden einen zufälligen Treffer · Problem und Lösung: RMAP-Sensitivität plus Hadoop | Waage Sensitivität gegen Laufzeit | 1:00 | 5:00 |
-| 6 | Seed-and-Extend: erst exakte Anker finden, dann genau prüfen | Seed = exakt passendes Teilstück · Hashtabelle · Verlängerung zum ganzen Alignment | Mini-Beispiel: Read mit Anker auf der Referenz | 1:30 | 6:30 |
-| 7 | k Fehler lassen immer einen Seed der Länge m/(k+1) unberührt | Read in k+1 Blöcke · Beispiel 36 bp, k = 4: 5 Blöcke à 7 bp · Folge: volle Sensitivität, aber kurze Seeds bringen viele Zufallstreffer | Read in farbigen Blöcken, Fehler treffen höchstens k davon | 1:30 | 8:00 |
-| 8 | MapReduce in 60 Sekunden | Map, Shuffle, Reduce am k-mer-Zählen (Beispiel aus dem Paper) · HDFS, Datenlokalität, Fehlertoleranz | Datenfluss mit 2 Mappern und 2 Reducern | 1:30 | 9:30 |
-| 9 | CloudBurst macht Seeds zu Schlüsseln | Map erzeugt Seeds aus Reads und Referenz · Shuffle bringt gleiche Seeds zusammen · Reduce verlängert | Gesamtpipeline nach Fig. 2, mit dem Mini-Beispiel | 1:00 | 10:30 |
-| 10 | Die Referenz liefert alle k-mere, ein Read nur k+1 disjunkte | Warum die Asymmetrie (Schubfach) · Reverse Complement der Reads · Wert = MerInfo mit Position und Flanken | Mini-Beispiel: die emittierten Schlüssel-Wert-Paare | 1:30 | 12:00 |
-| 11 | Der Reducer verlängert jedes Paar aus Referenz und Read | Mengen R und Q, alle Paare R × Q · Mismatches per Vergleich, Indels per Landau-Vishkin · Duplikate verwerfen | R × Q als Raster, daneben das DP-Band | 2:00 | 14:00 |
-| 12 | Ein Seed wie AAAAAAA würde einen Reducer lahmlegen | Low-Complexity-Seeds brauchten über 1 h statt unter 1 min · Redundanz-Trick verteilt sie | Reducer-Last vorher und nachher als Balken | 1:15 | 15:15 |
-| 13 | Ein zweiter Job behält nur das beste eindeutige Alignment | Schlüssel = Read-ID · Top-2-Optimierung und Combiner · Ausgabe identisch zu RMAP | kleiner zweiter Datenfluss | 0:45 | 16:00 |
-| 14 | Test mit 7 Mio. echten Reads auf 24 Kernen | 7,06 Mio. Illumina-Reads à 36 bp · Genom, Chromosom 1, Chromosom 22 · bis 4 Mismatches · RMAP auf 1 Kern | Icons statt Tabelle | 0:45 | 16:45 |
-| 15 | Die Laufzeit wächst linear mit den Reads, aber steil mit k | Fig. 3 · kürzere Seeds, mehr Zufallstreffer · 771 Mio. perfekte Treffer bei k = 0 · k = 4 auf dem ganzen Genom scheitert an voller Platte | Fig. 3 neu gezeichnet | 1:30 | 18:15 |
-| 16 | Auf 24 Kernen 2× bis 33× schneller als RMAP, je sensitiver, desto besser | Fig. 4 · bei k = 0 dominiert der Overhead · über 24× laut Paper durch Implementierungsunterschiede und mehr Cache und RAM · Ad-hoc-Aufteilung schafft 12× bis 29× | Speedup-Balken mit Linie bei 24× | 1:30 | 19:45 |
-| 17 | In der Cloud werden aus 14 Stunden 8 Minuten | 24 EC2-Kerne (High-CPU) schneller als der lokale Cluster · 4× mehr Kerne, 3,5× schneller · über 100× gegenüber RMAP | Laufzeit über Kernzahl mit Ideallinie | 1:15 | 21:00 |
-| 18 | Stark bei voller Sensitivität, doch heute dominieren BWT-Aligner | Stärken und Grenzen (siehe „Kritische Punkte“) · Nachfolger Crossbow | zwei Spalten: Stärken, Grenzen | 1:15 | 22:15 |
-| 19 | Fazit: drei Botschaften | Schubfachprinzip · Seeds als Schlüssel · lineare Skalierung | die drei Kerngrafiken verkleinert | 1:00 | 23:15 |
-| 20 | Quellen und Fragen | Paper, MapReduce, RMAP, Bildquellen | – | 0:15 | 23:30 |
+| 1 | CloudBurst: Hochsensitives Read-Mapping mit MapReduce | Titel, Paper (M. C. Schatz, Bioinformatics 2009), dein Name, Seminar | Read auf der Referenz mit einem Mismatch | 0:20 | 0:20 |
+| 2 | Gesucht: der Ursprung dieser 36 Buchstaben | Read-Mapping als Textsuche · 2,87 Mrd. Basen, 7 Mio. Reads, bis zu 4 Fehler | Schnipsel über einer Textwand | 0:45 | 1:05 |
+| 3 | Gleiche Treffer: Aus 14 Stunden werden 8 Minuten | Hauptergebnis vorweg · Leitfrage: über 100× schneller, ohne einen Treffer zu verlieren? | zwei maßstabsgetreue Balken | 0:35 | 1:40 |
+| 4 | Der rote Faden: fünf Fragen bis zur Antwort | Problem · Idee · Umsetzung · Beleg · Einordnung | fünf Stationen, Fortschrittsleiste läuft auf jeder Folie mit | 0:25 | 2:05 |
+| 5 | Sequenzierer liefern Millionen kurzer DNA-Schnipsel | Reads von 25 bis 250 bp, Referenzgenom mit 2,87 Mrd. Basen; für ein Genom wurden 4 Mrd. Reads à 35 bp kartiert (Bentley 2008) | Genom wird in viele Reads zerschnitten | 1:05 | 3:10 |
+| 6 | Read-Mapping sucht für jeden Read seine Stelle im Genom, trotz Fehlern | Mismatch (Hamming-Distanz) und Indel (Edit-Distanz) · Parameter k · echte Varianten (SNPs) und Sequenzierfehler | Reads unter der Referenz, Mismatch und Indel markiert | 1:15 | 4:25 |
+| 7 | Das Dilemma: Wer mehr Fehler erlaubt, wartet deutlich länger | BWT-Aligner im Schnellmodus: 2 Unterschiede am Read-Anfang, ein zufälliger Treffer · RMAP gründlich, aber seriell · CloudBurst will beides | Schema Tempo gegen Sensitivität | 0:55 | 5:20 |
+| 8 | Seed-and-Extend: erst exakte Anker finden, dann genau prüfen | Seed = exakt passendes Teilstück · Hashtabelle · Extend an den Fundstellen | Mini-Beispiel: Read mit Seed auf der Referenz | 1:15 | 6:35 |
+| 9 | Schubfachprinzip: k Fehler können höchstens k von k+1 Blöcken treffen | s = ⌊m/(k+1)⌋ · Beispiel 36 bp, k = 4: 5 Blöcke à 7 bp · Merksatz 1 | Read in farbigen Blöcken, ein Block bleibt fehlerfrei | 1:20 | 7:55 |
+| 10 | Der Preis der Gründlichkeit: Kurze Seeds passen zufällig fast überall | L/4^s Zufallstreffer pro Seed: 0,04 bei k = 1 bis 175.000 bei k = 4 | vier Karten für k = 1 bis 4 | 0:45 | 8:40 |
+| 11 | Extend mit Indels: Edit-Distanz per DP, und es zählt nur ein schmales Band | Edit-Distanz · DP-Rekurrenz, O(m · n) · Landau-Vishkin auf 2k + 1 Diagonalen, O(k · m) | ausgefüllte DP-Tabelle mit grünem Band | 1:15 | 9:55 |
+| 12 | MapReduce in 60 Sekunden: Map verteilt, Shuffle gruppiert, Reduce rechnet | Map, Shuffle, Reduce am k-mer-Zählen (Beispiel aus dem Paper) · Shuffle als verteilte Hashtabelle · Combiner · HDFS | Datenfluss mit 2 Mappern und 2 Reducern | 1:30 | 11:25 |
+| 13 | CloudBurst macht Seeds zu Schlüsseln | Seeds ausschneiden = Map, gleiche Seeds finden = Shuffle, verlängern = Reduce · Merksatz 2 | Gegenüberstellung Suchidee und Maschine | 0:55 | 12:20 |
+| 14 | Map: Die Referenz liefert jedes Fenster der Länge s, ein Read nur k+1 Blöcke | Warum die Asymmetrie · Wert = MerInfo mit Position und Flanken · Reverse Complement | Mini-Beispiel: die emittierten Schlüssel-Wert-Paare | 1:25 | 13:45 |
+| 15 | Shuffle und Reduce: Gleiche Seeds treffen sich, dann wird jedes Paar geprüft | Mengen R und Q, alle Paare R × Q · Mismatches per Vergleich, Indels per Landau-Vishkin · Duplikate · optionaler zweiter Job | Shuffle-Tabelle, daneben der Reducer für GACC | 1:35 | 15:20 |
+| 16 | Ein Seed wie AAAAAAA würde einen einzelnen Reducer lahmlegen | Low-Complexity-Seeds brauchten über 1 h statt unter 1 min · Redundanz-Trick verteilt sie | Reducer-Last vorher und nachher als Balken | 1:10 | 16:30 |
+| 17 | Laufzeit: ein fester Sockel plus Prüfarbeit, geteilt durch die Zahl der Kerne | P = L + 2(k+1) · n Paare · Sortieren O(P · log P) · C ≈ 2(k+1) · n · L/4^s Kandidaten · vier Vorhersagen (eigene Herleitung) | drei Phasen mit Formeln, darunter die Gesamtformel | 1:00 | 17:30 |
+| 18 | Der Test: 7 Millionen echte Reads, 24 Kerne, RMAP als Messlatte | 7,06 Mio. Illumina-Reads à 36 bp · Genom, Chromosom 1, Chromosom 22 · bis 4 Mismatches · RMAP auf 1 Kern | Kennzahlen und Referenzgrößen als Balken | 0:35 | 18:05 |
+| 19 | Die Laufzeit wächst linear mit den Reads, aber steil mit k | Fig. 3C · kürzere Seeds, mehr Zufallstreffer · k = 4 auf dem ganzen Genom scheitert nach 25 Mrd. Treffern an voller Platte | Fig. 3C neu gezeichnet | 1:15 | 19:20 |
+| 20 | Auf 24 Kernen 2× bis 33× schneller als RMAP: je sensitiver, desto besser | Fig. 4 · bei k = 0 dominiert der Sockel · über 24× laut Paper durch Implementierungsunterschiede und mehr Cache und RAM | Speedup-Balken mit Linie bei 24× | 1:15 | 20:35 |
+| 21 | In der Cloud werden aus 14 Stunden 8 Minuten | Fig. 5 · 4× mehr Kerne, 3,5× schneller · über 100× gegenüber RMAP · Merksatz 3 | Laufzeit über Kernzahl, gemessen und ideal | 1:05 | 21:40 |
+| 22 | Stark bei voller Sensitivität, doch den Alltag bestimmen heute BWT-Aligner | Stärken und Grenzen (siehe „Kritische Punkte“) · Bowtie, BWA, Crossbow | zwei Spalten: was überzeugt, was man kritisch sehen muss | 1:15 | 22:55 |
+| 23 | Drei Dinge zum Mitnehmen | Schubfachprinzip · Seeds als Schlüssel · Skalierung · Antwort auf die Leitfrage | die drei Kerngrafiken verkleinert | 1:00 | 23:55 |
+| 24 | Quellen und Fragen | Paper, MapReduce, RMAP, Landau-Vishkin, Edit-Distanz, Bildquellen | – | 0:15 | 24:10 |
 
-Wenn du beim Proben an Folie 13 später als 16:00 bist, kürze Folie 13 und 14 auf je 30 Sekunden.
+Der Puffer ist mit 0:50 knapper als im ersten Plan. Wenn du beim Proben an Folie 16 später als 16:30 bist, schiebe Folie 17 ins Backup (spart 1:00) oder kürze Folie 11 auf die zwei Sätze „Edit-Distanz per DP“ und „nur das Band zählt“.
 
-### Sechs Schlüsselgrafiken, in dieser Reihenfolge bauen
+### Sechs Schlüsselgrafiken
 
-1. Read unter der Referenz mit Mismatch und Indel (Folie 4)
-2. Read in k+1 Blöcken, Fehler treffen höchstens k davon (Folie 7)
-3. CloudBurst-Pipeline mit dem Mini-Beispiel (Folien 9 bis 11)
-4. Reducer-Last vor und nach dem Redundanz-Trick (Folie 12)
-5. Ergebnisplots: Laufzeit, Speedup, Cloud-Skalierung (Folien 15 bis 17)
-6. Genom wird zu Reads zerschnitten (Folie 3)
+1. Read unter der Referenz mit Mismatch und Indel (Folie 6)
+2. Read in k+1 Blöcken, Fehler treffen höchstens k davon (Folie 9)
+3. CloudBurst-Pipeline mit dem Mini-Beispiel (Folien 13 bis 15)
+4. Reducer-Last vor und nach dem Redundanz-Trick (Folie 16)
+5. Ergebnisplots: Laufzeit, Speedup, Cloud-Skalierung (Folien 19 bis 21)
+6. Genom wird zu Reads zerschnitten (Folie 5)
+
+Neu dazugekommen ist die DP-Tabelle mit dem Band (Folie 11). Sie wird auf den Backup-Folien 26 und 27 wiederverwendet.
 
 ### Backup-Folien
 
-- Landau-Vishkin Schritt für Schritt
-- MerInfo und Kodierung: 2 bit pro Base im Seed, 4 bit in den Flanken
-- Überschläge zu Kandidatenflut und Shuffle-Volumen (siehe „Tiefer verstehen“)
-- Ad-hoc-Parallelisierung im Detail
-- EC2-Instanztypen und Kosten
-- Amdahl-Rechnung zur Cloud-Skalierung
-- Bowtie und BWT in zwei Sätzen
-- Duplikat-Regel am Beispiel
+| Nr | Thema | Wofür |
+| --- | --- | --- |
+| 25 | Seed-and-Extend gibt es in vielen Varianten | BLAST, RMAP, Spaced Seeds, Suffixbaum, BWT im Vergleich |
+| 26 | So füllt die dynamische Programmierung ein Feld der Tabelle | Edit-Distanz konkret: Startwerte, Rekurrenz, Rückweg, Varianten |
+| 27 | Landau-Vishkin Schritt für Schritt | L[d, e], ein Schritt, woher O(k · m) kommt |
+| 28 | So prüft der Reducer einen Kandidaten mit Indels | Landau-Vishkin vom Seed aus nach links und rechts, Flankenlänge m − s + k |
+| 29 | Ein Combiner fasst Werte schon vor dem Shuffle zusammen | Zählbeispiel mit Combiner, Einsatz im Filter-Job |
+| 30 | Ein zweiter Job behält nur das beste eindeutige Alignment | Filter-Job, Top-2-Optimierung, Ausgabe wie RMAPM |
+| 31 | Ein Alignment wird mehrfach gefunden, aber nur einmal gemeldet | Duplikat-Regel am Beispiel |
+| 32 | Die Laufzeit Phase für Phase | Terme der Laufzeitfolie, schlimmster Fall, Vergleich mit RMAP |
+| 33 | So viele Kandidaten entstehen im ganzen Genom | Überschlag zur Kandidatenflut (siehe „Tiefer verstehen“) |
+| 34 | 24 getrennte RMAP-Läufe schaffen 12× bis 29× | Ad-hoc-Parallelisierung im Detail |
+| 35 | Die Wahl der Instanz zählt mehr als die Zahl der Kerne | EC2-Instanztypen und Kosten |
+| 36 | Amdahl erklärt, warum 4× so viele Kerne nur 3,5× bringen | Amdahl-Rechnung zur Cloud-Skalierung |
+
+Nicht als eigene Folie umgesetzt: MerInfo-Kodierung (steht in der Notiz zu Folie 14), Shuffle-Volumen (Notiz zu Folie 22) und Bowtie/BWT in zwei Sätzen (Notiz zu Folie 22 und Backup 25).
 
 ## Paper verstehen
 
@@ -148,13 +162,13 @@ Lies das Paper dreimal mit steigender Tiefe. Nach dem zweiten Durchgang solltest
 
 | Abschnitt | Inhalt | Rolle im Vortrag |
 | --- | --- | --- |
-| 1 Introduction | NGS-Datenflut, Read-Mapping, bestehende Tools | Motivation, Folien 3 bis 5 |
-| 1.1 MapReduce and Hadoop | Map, Shuffle, Reduce, Combiner, Amdahl, HDFS, EC2 | kurz, Folie 8 |
-| 1.2 Read mapping | Mismatch und Indel, Seed-and-Extend, Schubfach-Argument, BWT-Tools | zentral, Folien 6 und 7 |
-| 2 Algorithm (2.1 bis 2.4) | Map, Shuffle, Reduce, Load-Balancing, Filterung | Kern, Folien 9 bis 13 |
-| 3 Results | lokaler Cluster: Skalierung, Vergleich mit RMAP, Ad-hoc-Aufteilung | Folien 14 bis 16 |
-| 4 Amazon Cloud Results | EC2-Instanztypen, Skalierung bis 96 Kerne | Folie 17 |
-| 5 Discussion | Einordnung, Future Work | Folie 18 |
+| 1 Introduction | NGS-Datenflut, Read-Mapping, bestehende Tools | Motivation, Folien 5 bis 7 |
+| 1.1 MapReduce and Hadoop | Map, Shuffle, Reduce, Combiner, Amdahl, HDFS, EC2 | kurz, Folie 12, Combiner auch in Backup 29 |
+| 1.2 Read mapping | Mismatch und Indel, Seed-and-Extend, Schubfach-Argument, BWT-Tools | zentral, Folien 8 bis 11 |
+| 2 Algorithm (2.1 bis 2.4) | Map, Shuffle, Reduce, Load-Balancing, Filterung | Kern, Folien 13 bis 17 |
+| 3 Results | lokaler Cluster: Skalierung, Vergleich mit RMAP, Ad-hoc-Aufteilung | Folien 18 bis 20 |
+| 4 Amazon Cloud Results | EC2-Instanztypen, Skalierung bis 96 Kerne | Folie 21 |
+| 5 Discussion | Einordnung, Future Work | Folie 22 |
 
 ### Das Paper in fünf Sätzen
 
@@ -274,11 +288,11 @@ Alle Messungen nutzen 7,06 Mio. echte Reads à 36 bp und erlauben bis zu 4 Misma
 
 ### Welche Abbildung wofür
 
-- Fig. 1, MapReduce-Schema: Folie 8, besser neu zeichnen
-- Fig. 2, CloudBurst-Überblick: Folie 9
-- Fig. 3, Laufzeit über Read-Zahl für Genom, Chr. 1 und Chr. 22: Folie 15
-- Fig. 4, Speedup gegenüber RMAP: Folie 16
-- Fig. 5, Skalierung auf EC2: Folie 17
+- Fig. 1, MapReduce-Schema: Folie 12, neu gezeichnet
+- Fig. 2, CloudBurst-Überblick: Folien 13 bis 15
+- Fig. 3, Laufzeit über Read-Zahl für Genom, Chr. 1 und Chr. 22: Folie 19 (gezeigt wird Fig. 3C)
+- Fig. 4, Speedup gegenüber RMAP: Folie 20
+- Fig. 5, Skalierung auf EC2: Folie 21
 
 ## Tiefer verstehen: eigene Überschläge
 
@@ -324,7 +338,7 @@ Mit diesem f brächten 192 Kerne nur 6× statt 8× Tempo gegenüber 24 Kernen, u
 
 ## Kritische Punkte und erwartbare Fragen
 
-Das Paper ist sauber, lässt aber einige Fragen offen. Die folgenden Punkte gehören auf die Einordnungsfolie (Folie 18) und in deine Vorbereitung auf die Diskussion.
+Das Paper ist sauber, lässt aber einige Fragen offen. Die folgenden Punkte gehören auf die Einordnungsfolie (Folie 22) und in deine Vorbereitung auf die Diskussion.
 
 ### Kritische Punkte
 
@@ -335,23 +349,30 @@ Das Paper ist sauber, lässt aber einige Fragen offen. Die folgenden Punkte geh�
 - „Alle Treffer“ erzeugt riesige Ausgaben: 771 Mio. bei k = 0, Abbruch nach 25 Mrd. bei k = 4.
 - Die ganze Referenz wird in jedem Lauf neu emittiert und geshuffelt. Nur größere Read-Batches verteilen diesen Aufwand.
 - Kleiner Rechenfehler: Ein zufälliges 7-mer trifft das Genom rund 175.000-mal, nicht „> 17 500“-mal.
+- Unstimmigkeit zwischen zwei Messungen: Fig. 3C zeigt für Chromosom 22, k = 4 und 7 Mio. Reads rund 2.750 s, Abschnitt 4 nennt für denselben Cluster 1.921 s. Vermutlich meldet Fig. 3 alle Alignments, während die späteren Läufe den Filter-Job nutzen. Das Paper sagt das nur für Fig. 4 ausdrücklich.
+- Das Paper gibt keine Laufzeitformel an. Die Formel auf Folie 17 ist eine eigene Herleitung aus seinen Bausteinen und muss im Vortrag so benannt werden.
 - Heute dominieren BWT-Aligner wie Bowtie und BWA, Reads sind länger und gepaart, und für Big-Data-Pipelines hat Spark Hadoop MapReduce weitgehend abgelöst.
 
 ### Erwartbare Fragen
 
 | Frage | Antwortskizze | Backup-Folie |
 | --- | --- | --- |
-| Findet CloudBurst garantiert alle Treffer mit höchstens k Unterschieden? | Ja. k+1 disjunkte Blöcke, k Fehler treffen höchstens k davon. Das gilt auch für Indels (Baeza-Yates 1992, im Paper zitiert). | Schubfach (Folie 7) |
-| Warum alle k-mere der Referenz, aber nur disjunkte der Reads? | Der fehlerfreie Block kann an jeder Genomposition beginnen. Beim Read reicht die Zerlegung in k+1 Blöcke, das spart Paare. | Mini-Beispiel |
-| Warum nicht einfach die Reads aufteilen und RMAP 24-mal starten? | Im Paper getestet: nur 12× bis 29×, weil die Teilläufe unterschiedlich lange brauchen. Dazu fehlen Fehlertoleranz und Datenlokalität, und jeder Rechner braucht die ganze Referenz. | Ad-hoc-Parallelisierung |
-| Warum ist der Speedup bei k = 0 so klein? | Der fixe Aufwand, alle Referenz-k-mere zu emittieren und zu shufflen, dominiert. Pro Seed gibt es kaum Rechenarbeit (Amdahl). | Shuffle-Volumen |
-| Wie verhindert CloudBurst doppelte Treffer? | Nur der Seed mit dem kleinsten Offset behält ein Alignment. Jeder Reducer entscheidet das lokal anhand der Flanken. | Duplikat-Regel |
-| Was passiert mit sehr häufigen Seeds wie AAAAAAA? | Redundanz-Trick: Referenzkopien, Reads zufällig verteilt. Gleiche Gesamtarbeit, aber parallel. | Folie 12 |
-| Warum haben sich BWT-Aligner durchgesetzt? | Kompakter Index, sehr schnell bei wenigen Fehlern und Suche nach dem besten Treffer, und das reicht den meisten Anwendungen. CloudBurst lohnt sich, wenn alle Treffer oder viele Fehler gebraucht werden. | Bowtie und BWT |
+| Findet CloudBurst garantiert alle Treffer mit höchstens k Unterschieden? | Ja. k+1 disjunkte Blöcke, k Fehler treffen höchstens k davon. Das gilt auch für Indels (Baeza-Yates 1992, im Paper zitiert). | Schubfach (Folie 9) |
+| Warum alle k-mere der Referenz, aber nur disjunkte der Reads? | Der fehlerfreie Block kann an jeder Genomposition beginnen. Beim Read reicht die Zerlegung in k+1 Blöcke, das spart Paare. | Mini-Beispiel (Folie 14) |
+| Warum nicht einfach die Reads aufteilen und RMAP 24-mal starten? | Im Paper getestet: nur 12× bis 29×, weil die Teilläufe unterschiedlich lange brauchen. Dazu fehlen Fehlertoleranz und Datenlokalität, und jeder Rechner braucht die ganze Referenz. | Backup 34 |
+| Warum ist der Speedup bei k = 0 so klein? | Der fixe Aufwand, alle Referenz-k-mere zu emittieren und zu shufflen, dominiert. Pro Seed gibt es kaum Rechenarbeit (Amdahl). | Laufzeit (Folie 17, Backup 32) |
+| Wie verhindert CloudBurst doppelte Treffer? | Nur der Seed mit dem kleinsten Offset behält ein Alignment. Jeder Reducer entscheidet das lokal anhand der Flanken. | Backup 31 |
+| Was passiert mit sehr häufigen Seeds wie AAAAAAA? | Redundanz-Trick: Referenzkopien, Reads zufällig verteilt. Gleiche Gesamtarbeit, aber parallel. | Folie 16 |
+| Warum haben sich BWT-Aligner durchgesetzt? | Kompakter Index, sehr schnell bei wenigen Fehlern und Suche nach dem besten Treffer, und das reicht den meisten Anwendungen. CloudBurst lohnt sich, wenn alle Treffer oder viele Fehler gebraucht werden. | Backup 25 |
 | Würde man das heute mit Spark bauen? | Möglich. Vorteil: Referenz-k-mere im Speicher halten und für mehrere Read-Batches wiederverwenden. Das Shuffle-Volumen pro Batch bleibt. | – |
 | Nutzt CloudBurst Basenqualitäten oder Paired-End-Reads? | Nein, beides nennt das Paper als Future Work. | – |
-| Was kostet ein Lauf in der Cloud? | Eigene Rechnung: 96 Kerne = 48 High-CPU-Medium-Instanzen × 0,20 $ ≈ 10 $ pro Stunde Clusterbetrieb, der Lauf dauert rund 8 Minuten. Dazu kommen Start und Datenupload. | EC2-Instanztypen und Kosten |
-| Wie viel bringt mehr Hardware noch? | Amdahl-Schätzung: Etwa 5 % skalieren nicht, also höchstens 21× gegenüber 24 Kernen. Besseres Load-Balancing hilft mehr. | Amdahl-Rechnung |
+| Was kostet ein Lauf in der Cloud? | Eigene Rechnung: 96 Kerne = 48 High-CPU-Medium-Instanzen × 0,20 $ ≈ 10 $ pro Stunde Clusterbetrieb, der Lauf dauert rund 8 Minuten. Dazu kommen Start und Datenupload. | Backup 35 |
+| Wie viel bringt mehr Hardware noch? | Amdahl-Schätzung: Etwa 5 % skalieren nicht, also höchstens 21× gegenüber 24 Kernen. Besseres Load-Balancing hilft mehr. | Backup 36 |
+| Was ist die Edit-Distanz, und wie berechnet man sie? | Kleinste Zahl an Ersetzungen, Einfügungen und Löschungen. Dynamische Programmierung über eine Tabelle, jedes Feld aus drei Nachbarn, O(m · n). | Folie 11, Backup 26 |
+| Wie arbeitet Landau-Vishkin, und wie nutzt CloudBurst ihn für Indels? | Bei höchstens k Fehlern zählen nur 2k + 1 Diagonalen. Pro Diagonale und Fehlerzahl merkt man sich die weiteste Position, O(k · m). Im Reducer vom Seed aus nach links und rechts über die Flanken. | Backup 27 und 28 |
+| Was ist ein Combiner, und nutzt CloudBurst einen? | Ein Vorab-Reduce im Mapper, der Daten im Shuffle spart. CloudBurst nutzt ihn nur im Filter-Job (Top 2 pro Read). | Folie 12, Backup 29 |
+| Wie ist die Laufzeit des Algorithmus? | Sockel für Zerlegen und Sortieren plus Prüfarbeit C ≈ 2(k+1) · n · L/4^s, geteilt durch die Kerne. Im schlimmsten Fall landet alles in einem Seed, dann L · 2(k+1) · n Paare. Eigene Herleitung. | Folie 17, Backup 32 |
+| Welche anderen Seed-and-Extend-Verfahren gibt es? | Hashtabelle über Referenz (BLAST) oder Reads (RMAP), Spaced Seeds (SOAP, MAQ, ZOOM), Suffixbaum (MUMmer), BWT (Bowtie, BWA). | Backup 25 |
 
 ## Selbsttest
 
@@ -399,6 +420,20 @@ Für Phase 1 reichen das Paper, die ersten drei Abschnitte des MapReduce-Artikel
 - Landau, G. M.; Vishkin, U. (1986): Introducing efficient parallelism into approximate string matching and a new serial algorithm. STOC 1986, 220–230.
 - Gusfield, D. (1997): Algorithms on Strings, Trees, and Sequences. Cambridge University Press. Lehrbuch-Erklärung zum k-difference-Problem.
 - Baeza-Yates, R. A. et al. (1992): Fast and practical approximate string matching. CPM 1992, 185–192. Quelle des Schubfach-Arguments.
+
+### Zusätzlich in den Foliennotizen zitiert
+
+Für alles, was nicht im Paper steht, nennen die Notizen eine Quelle. Die wichtigsten:
+
+- Levenshtein, V. I. (1966): Binary codes capable of correcting deletions, insertions, and reversals. Soviet Physics Doklady 10(8), 707–710. Definition der Edit-Distanz.
+- Wagner, R. A.; Fischer, M. J. (1974): The string-to-string correction problem. Journal of the ACM 21(1), 168–173. DP-Rekurrenz.
+- Ukkonen, E. (1985): Algorithms for approximate string matching. Information and Control 64, 100–118. Band aus 2k + 1 Diagonalen.
+- Landau, G. M.; Vishkin, U. (1989): Fast parallel and serial approximate string matching. Journal of Algorithms 10(2), 157–169.
+- Navarro, G. (2001): A guided tour to approximate string matching. ACM Computing Surveys 33(1), 31–88.
+- Li, H.; Homer, N. (2010): A survey of sequence alignment algorithms for next-generation sequencing. Briefings in Bioinformatics 11(5), 473–483. Überblick über Seed-and-Extend und BWT-Aligner.
+- Dean, J.; Ghemawat, S. (2004): MapReduce: Simplified Data Processing on Large Clusters. OSDI 2004, 137–150. Combiner und Sortieren im Shuffle.
+
+Die Seitenangaben stammen nicht aus einer Datenbankabfrage und sollten vor der Ausarbeitung einmal gegengeprüft werden.
 
 ### Einordnung
 
