@@ -97,7 +97,7 @@ Kernbotschaft in einem Satz: CloudBurst macht hochsensitives Read-Mapping skalie
 | 4 | Der rote Faden: fünf Fragen bis zur Antwort | Hintergrund · Idee · Umsetzung · Beleg · Fazit | fünf Stationen, Fortschrittsleiste läuft auf jeder Folie mit | 0:25 | 2:05 |
 | 5 | Sequenzierer liefern Millionen kurzer DNA-Schnipsel | Reads von 25 bis 250 bp, Referenzgenom mit 2,87 Mrd. Basen; für ein Genom wurden 4 Mrd. Reads à 35 bp kartiert (Bentley 2008) | Genom wird in viele Reads zerschnitten | 1:05 | 3:10 |
 | 6 | Read-Mapping sucht für jeden Read seine Stelle im Genom, trotz Fehlern | Mismatch (Hamming-Distanz) und Indel (Edit-Distanz) · Parameter k · echte Varianten (SNPs) und Sequenzierfehler | Reads unter der Referenz, Mismatch und Indel markiert | 1:15 | 4:25 |
-| 7 | Seed-and-Extend: erst exakte Anker finden, dann genau prüfen | Seed = exakt passendes Teilstück · Hashtabelle · Extend an den Fundstellen | Mini-Beispiel: Read mit Seed auf der Referenz | 1:15 | 5:40 |
+| 7 | Seed-and-Extend: erst exakte Anker finden, dann genau prüfen | Seed = exakt passendes Teilstück · Hashtabelle · Extend an den Fundstellen | Mini-Beispiel: Read mit Seed auf der Referenz, je ein Kasten um Seed und Extend | 1:15 | 5:40 |
 | 8 | Schubfachprinzip: k Fehler können höchstens k von k+1 Blöcken treffen | s = ⌊m/(k+1)⌋ · Beispiel 36 bp, k = 4: 5 Blöcke à 7 bp · Merksatz 1 | Read in farbigen Blöcken, ein Block bleibt fehlerfrei | 1:20 | 7:00 |
 | 9 | Extend mit Indels: Edit-Distanz per DP, und es zählt nur ein schmales Band | Edit-Distanz · DP-Rekurrenz, O(m · n) · Landau-Vishkin auf 2k + 1 Diagonalen, O(k · m) | ausgefüllte DP-Tabelle mit grünem Band | 1:15 | 8:15 |
 | 10 | Der Preis der Gründlichkeit: Kurze Seeds passen zufällig fast überall | L/4^s Zufallstreffer pro Seed: 0,04 bei k = 1 bis 175.000 bei k = 4 | vier Karten für k = 1 bis 4 | 0:45 | 9:00 |
@@ -249,7 +249,7 @@ Reads der Länge m = 8, erlaubt ist k = 1 Unterschied, also Seeds der Länge s =
 ```
 Ref-Position   012345678901
 Referenz       CTGACCTGGCAT
-Read 1           GACCAGGC      Mismatch an Pos. 6 (Read A, Referenz T)
+Read 1           GACCTAGC      Mismatch an Pos. 7 (Read A, Referenz G)
 Read 2           GTCCTGGC      Mismatch an Pos. 3 (Read T, Referenz A)
 ```
 
@@ -259,10 +259,10 @@ So sieht der Shuffle die Schlüssel, und das tun die Reducer:
 | --- | --- | --- | --- |
 | GACC | Position 2 | Read 1, Offset 0 | Start 2 − 0 = 2, Vergleich ergibt 1 Mismatch: Treffer |
 | TGGC | Position 6 | Read 2, Offset 4 | Start 6 − 4 = 2, Vergleich ergibt 1 Mismatch: Treffer |
-| AGGC | – | Read 1, Offset 4 | nur eine Seite, nichts zu tun |
+| TAGC | – | Read 1, Offset 4 | nur eine Seite, nichts zu tun |
 | GTCC | – | Read 2, Offset 0 | nur eine Seite, nichts zu tun |
 | CTGA, TGAC, ACCT, CCTG, CTGG, GGCA, GCAT | je eine Position | – | nichts zu tun |
-| GCCT, GGTC, GCCA, GGAC (Reverse Complements) | – | je ein Read | nichts zu tun |
+| GCTA, GGTC, GCCA, GGAC (Reverse Complements) | – | je ein Read | nichts zu tun |
 
 Read 1 wird über seinen ersten Block gefunden, Read 2 über den zweiten. Genau das garantiert das Schubfachprinzip: Der eine Fehler kann nur einen der zwei Blöcke treffen.
 
