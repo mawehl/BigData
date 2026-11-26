@@ -104,7 +104,7 @@ Kernbotschaft in einem Satz: CloudBurst macht hochsensitives Read-Mapping skalie
 | 11 | Das Dilemma: Wer mehr Fehler erlaubt, wartet deutlich länger | Kette: mehr Fehler → kürzere Seeds → mehr Zufallstreffer → mehr Prüfarbeit · BWT-Aligner im Schnellmodus: höchstens 2 Unterschiede am Read-Anfang, ein zufälliger Treffer · RMAP gründlich, aber über 14 h auf 1 Kern · Genau hier setzt CloudBurst an | Ursachenkette, darunter zwei Karten: schnell gegen gründlich | 0:55 | 9:55 |
 | 12 | MapReduce in 60 Sekunden: Map verteilt, Shuffle gruppiert, Reduce rechnet | Map, Shuffle, Reduce am k-mer-Zählen (Beispiel aus dem Paper) · Shuffle als verteilte Hashtabelle · Combiner · HDFS | Datenfluss mit 2 Mappern und 2 Reducern | 1:30 | 11:25 |
 | 13 | CloudBurst macht Seeds zu Schlüsseln | Seeds ausschneiden = Map, gleiche Seeds finden = Shuffle, verlängern = Reduce · Merksatz 2 | Gegenüberstellung Suchidee und Maschine | 0:55 | 12:20 |
-| 14 | Map: Die Referenz liefert jedes Fenster der Länge s, ein Read nur k+1 Blöcke | Warum die Asymmetrie · Wert = MerInfo mit Position und Flanken · Reverse Complement | Mini-Beispiel: die emittierten Schlüssel-Wert-Paare | 1:25 | 13:45 |
+| 14 | Map: Die Referenz liefert jedes Fenster der Länge s, ein Read nur k+1 Blöcke | Warum die Asymmetrie · Wert = MerInfo mit Position und Flanken · Reverse Complement | Mini-Beispiel: die emittierten Schlüssel-Wert-Paare, unten das Paar für GACC aus Referenz und Read 1 mit allen MerInfo-Feldern, daneben eine Box, was mitreist | 1:25 | 13:45 |
 | 15 | Shuffle und Reduce: Gleiche Seeds treffen sich, dann wird jedes Paar geprüft | Mengen R und Q, alle Paare R × Q · Mismatches per Vergleich, Indels per Landau-Vishkin · Duplikate · optionaler zweiter Job | Shuffle-Tabelle, daneben der Reducer für GACC | 1:35 | 15:20 |
 | 16 | Ein Seed wie AAAAAAA würde einen einzelnen Reducer lahmlegen | Low-Complexity-Seeds brauchten über 1 h statt unter 1 min · Redundanz-Trick verteilt sie | Reducer-Last vorher und nachher als Balken | 1:10 | 16:30 |
 | 17 | Laufzeit: ein fester Sockel plus Prüfarbeit, geteilt durch die Zahl der Kerne | P = L + 2(k+1) · n Paare · Sortieren O(P · log P) · C ≈ 2(k+1) · n · L/4^s Kandidaten · vier Vorhersagen (eigene Herleitung) | drei Phasen mit Formeln, darunter die Gesamtformel | 1:00 | 17:30 |
@@ -263,6 +263,8 @@ So sieht der Shuffle die Schlüssel, und das tun die Reducer:
 | GTCC | – | Read 2, Offset 0 | nur eine Seite, nichts zu tun |
 | CTGA, TGAC, ACCT, CCTG, CTGG, GGCA, GCAT | je eine Position | – | nichts zu tun |
 | GCTA, GGTC, GCCA, GGAC (Reverse Complements) | – | je ein Read | nichts zu tun |
+
+Der Wert zum Schlüssel GACC (Folie 14): aus der Referenz (Ref, 2, isRef 1, isRC 0, CT, TGGCA), aus Read 1 (R1, 0, isRef 0, isRC 0, –, TAGC). Die Flanken sind höchstens m − s + k = 5 Basen lang.
 
 Read 1 wird über seinen ersten Block gefunden, Read 2 über den zweiten. Genau das garantiert das Schubfachprinzip: Der eine Fehler kann nur einen der zwei Blöcke treffen.
 
