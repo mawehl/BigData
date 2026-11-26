@@ -140,20 +140,21 @@ Neu dazugekommen ist die DP-Tabelle mit dem Band (Folie 9). Sie wird auf den Bac
 | 29 | Landau-Vishkin Schritt für Schritt | L[d, e], ein Schritt, woher O(k · m) kommt |
 | 30 | Das Schubfachprinzip gilt auch mit Indels | exakter Block liegt verschoben, Start nur bis auf ± k bekannt |
 | 31 | So prüft der Reducer einen Kandidaten mit Indels | Landau-Vishkin vom Seed aus nach links und rechts, Flankenlänge m − s + k |
-| 32 | Ein Combiner fasst Werte schon vor dem Shuffle zusammen | Zählbeispiel mit Combiner, Einsatz im Filter-Job |
-| 33 | Ein zweiter Job behält nur das beste eindeutige Alignment | Filter-Job, Top-2-Optimierung, Ausgabe wie RMAPM |
-| 34 | Ein Alignment wird mehrfach gefunden, aber nur einmal gemeldet | Duplikat-Regel am Beispiel |
-| 35 | Die Laufzeit Phase für Phase | Terme der Laufzeitfolie, schlimmster Fall, Vergleich mit RMAP |
-| 36 | So viele Kandidaten entstehen im ganzen Genom | Überschlag zur Kandidatenflut (siehe „Tiefer verstehen“) |
-| 37 | Der Vergleich mit RMAP misst zwei Systeme | Hardware beider Seiten, Kernzeit gegen Wartezeit |
-| 38 | Auf dem ganzen Genom bleibt es bei rund 11× | Laufzeiten aus Fig. 3A, warum nur Chromosom 22 gezeigt wird |
-| 39 | 24 getrennte RMAP-Läufe schaffen 12× bis 29× | Ad-hoc-Parallelisierung im Detail |
-| 40 | Die Wahl der Instanz zählt mehr als die Zahl der Kerne | EC2-Instanztypen und Kosten |
-| 41 | Amdahl erklärt, warum 4× so viele Kerne nur 3,5× bringen | Amdahl-Rechnung zur Cloud-Skalierung |
+| 32 | HDFS speichert jeden Block dreimal, Hadoop rechnet bei den Daten | NameNode und DataNodes, Blöcke und Kopien, Datenlokalität, wie CloudBurst seine Daten lädt |
+| 33 | Ein Combiner fasst Werte schon vor dem Shuffle zusammen | Zählbeispiel mit Combiner, Einsatz im Filter-Job |
+| 34 | Ein zweiter Job behält nur das beste eindeutige Alignment | Filter-Job, Top-2-Optimierung, Ausgabe wie RMAPM |
+| 35 | Ein Alignment wird mehrfach gefunden, aber nur einmal gemeldet | Duplikat-Regel am Beispiel |
+| 36 | Die Laufzeit Phase für Phase | Terme der Laufzeitfolie, schlimmster Fall, Vergleich mit RMAP |
+| 37 | So viele Kandidaten entstehen im ganzen Genom | Überschlag zur Kandidatenflut (siehe „Tiefer verstehen“) |
+| 38 | Der Vergleich mit RMAP misst zwei Systeme | Hardware beider Seiten, Kernzeit gegen Wartezeit |
+| 39 | Auf dem ganzen Genom bleibt es bei rund 11× | Laufzeiten aus Fig. 3A, warum nur Chromosom 22 gezeigt wird |
+| 40 | 24 getrennte RMAP-Läufe schaffen 12× bis 29× | Ad-hoc-Parallelisierung im Detail |
+| 41 | Die Wahl der Instanz zählt mehr als die Zahl der Kerne | EC2-Instanztypen und Kosten |
+| 42 | Amdahl erklärt, warum 4× so viele Kerne nur 3,5× bringen | Amdahl-Rechnung zur Cloud-Skalierung |
 
-Die Folien 27, 30, 37 und 38 sind für die kritischen Fragen dazugekommen: BWT-Aligner, Indels im Schubfachprinzip, Fairness des RMAP-Vergleichs und das ganze Genom.
+Die Folien 27, 30, 38 und 39 sind für die kritischen Fragen dazugekommen: BWT-Aligner, Indels im Schubfachprinzip, Fairness des RMAP-Vergleichs und das ganze Genom.
 
-Nicht als eigene Folie umgesetzt: MerInfo-Kodierung (steht in der Notiz zu Folie 14). Das Shuffle-Volumen steht als Überschlag auf Backup 38.
+Nicht als eigene Folie umgesetzt: MerInfo-Kodierung (steht in der Notiz zu Folie 14). Das Shuffle-Volumen steht als Überschlag auf Backup 39.
 
 ## Paper verstehen
 
@@ -170,7 +171,7 @@ Lies das Paper dreimal mit steigender Tiefe. Nach dem zweiten Durchgang solltest
 | Abschnitt | Inhalt | Rolle im Vortrag |
 | --- | --- | --- |
 | 1 Introduction | NGS-Datenflut, Read-Mapping, bestehende Tools | Motivation, Folien 5, 6 und 11 |
-| 1.1 MapReduce and Hadoop | Map, Shuffle, Reduce, Combiner, Amdahl, HDFS, EC2 | kurz, Folie 12, Combiner auch in Backup 32 |
+| 1.1 MapReduce and Hadoop | Map, Shuffle, Reduce, Combiner, Amdahl, HDFS, EC2 | kurz, Folie 12, Combiner auch in Backup 33 |
 | 1.2 Read mapping | Mismatch und Indel, Seed-and-Extend, Schubfach-Argument, BWT-Tools | zentral, Folien 7 bis 11 |
 | 2 Algorithm (2.1 bis 2.4) | Map, Shuffle, Reduce, Load-Balancing, Filterung | Kern, Folien 13 bis 18 |
 | 3 Results | lokaler Cluster: Skalierung, Vergleich mit RMAP, Ad-hoc-Aufteilung | Folien 19 bis 21 |
@@ -370,19 +371,20 @@ Das Paper ist sauber, lässt aber einige Fragen offen. Die folgenden Punkte geh�
 | --- | --- | --- |
 | Findet CloudBurst garantiert alle Treffer mit höchstens k Unterschieden? | Ja. k+1 disjunkte Blöcke, k Fehler treffen höchstens k davon. Das gilt auch für Indels (Baeza-Yates 1992, im Paper zitiert). | Schubfach (Folie 8) |
 | Warum alle k-mere der Referenz, aber nur disjunkte der Reads? | Der fehlerfreie Block kann an jeder Genomposition beginnen. Beim Read reicht die Zerlegung in k+1 Blöcke, das spart Paare. | Mini-Beispiel (Folie 14) |
-| Warum nicht einfach die Reads aufteilen und RMAP 24-mal starten? | Im Paper getestet: nur 12× bis 29×, weil die Teilläufe unterschiedlich lange brauchen. Dazu fehlen Fehlertoleranz und Datenlokalität, und jeder Rechner braucht die ganze Referenz. | Backup 39 |
-| Warum ist der Speedup bei k = 0 so klein? | Der fixe Aufwand, alle Referenz-k-mere zu emittieren und zu shufflen, dominiert. Pro Seed gibt es kaum Rechenarbeit (Amdahl). | Laufzeit (Folie 18, Backup 35) |
-| Wie verhindert CloudBurst doppelte Treffer? | Nur der Seed mit dem kleinsten Offset behält ein Alignment. Jeder Reducer entscheidet das lokal anhand der Flanken. | Backup 34 |
+| Warum nicht einfach die Reads aufteilen und RMAP 24-mal starten? | Im Paper getestet: nur 12× bis 29×, weil die Teilläufe unterschiedlich lange brauchen. Dazu fehlen Fehlertoleranz und Datenlokalität, und jeder Rechner braucht die ganze Referenz. | Backup 40 |
+| Warum ist der Speedup bei k = 0 so klein? | Der fixe Aufwand, alle Referenz-k-mere zu emittieren und zu shufflen, dominiert. Pro Seed gibt es kaum Rechenarbeit (Amdahl). | Laufzeit (Folie 18, Backup 36) |
+| Wie verhindert CloudBurst doppelte Treffer? | Nur der Seed mit dem kleinsten Offset behält ein Alignment. Jeder Reducer entscheidet das lokal anhand der Flanken. | Backup 35 |
 | Was passiert mit sehr häufigen Seeds wie AAAAAAA? | Redundanz-Trick: Referenzkopien, Reads zufällig verteilt. Gleiche Gesamtarbeit, aber parallel. | Folie 17 |
 | Warum haben sich BWT-Aligner durchgesetzt? | Kompakter Index, sehr schnell bei wenigen Fehlern und Suche nach dem besten Treffer, und das reicht den meisten Anwendungen. CloudBurst lohnt sich, wenn alle Treffer oder viele Fehler gebraucht werden. | Backup 27 |
 | Würde man das heute mit Spark bauen? | Möglich. Vorteil: Referenz-k-mere im Speicher halten und für mehrere Read-Batches wiederverwenden. Das Shuffle-Volumen pro Batch bleibt. | – |
 | Nutzt CloudBurst Basenqualitäten oder Paired-End-Reads? | Nein, beides nennt das Paper als Future Work. | – |
-| Was kostet ein Lauf in der Cloud? | Eigene Rechnung: 96 Kerne = 48 High-CPU-Medium-Instanzen × 0,20 $ ≈ 10 $ pro Stunde Clusterbetrieb, der Lauf dauert rund 8 Minuten. Dazu kommen Start und Datenupload. | Backup 40 |
-| Wie viel bringt mehr Hardware noch? | Amdahl-Schätzung: Etwa 5 % skalieren nicht, also höchstens 21× gegenüber 24 Kernen. Besseres Load-Balancing hilft mehr. | Backup 41 |
+| Was kostet ein Lauf in der Cloud? | Eigene Rechnung: 96 Kerne = 48 High-CPU-Medium-Instanzen × 0,20 $ ≈ 10 $ pro Stunde Clusterbetrieb, der Lauf dauert rund 8 Minuten. Dazu kommen Start und Datenupload. | Backup 41 |
+| Wie viel bringt mehr Hardware noch? | Amdahl-Schätzung: Etwa 5 % skalieren nicht, also höchstens 21× gegenüber 24 Kernen. Besseres Load-Balancing hilft mehr. | Backup 42 |
 | Was ist die Edit-Distanz, und wie berechnet man sie? | Kleinste Zahl an Ersetzungen, Einfügungen und Löschungen. Dynamische Programmierung über eine Tabelle, jedes Feld aus drei Nachbarn, O(m · n). | Folie 9, Backup 28 |
 | Wie arbeitet Landau-Vishkin, und wie nutzt CloudBurst ihn für Indels? | Bei höchstens k Fehlern zählen nur 2k + 1 Diagonalen. Pro Diagonale und Fehlerzahl merkt man sich die weiteste Position, O(k · m). Im Reducer vom Seed aus nach links und rechts über die Flanken. | Folie 16, Backup 29 und 31 |
-| Was ist ein Combiner, und nutzt CloudBurst einen? | Ein Vorab-Reduce im Mapper, der Daten im Shuffle spart. CloudBurst nutzt ihn nur im Filter-Job (Top 2 pro Read). | Folie 12, Backup 32 |
-| Wie ist die Laufzeit des Algorithmus? | Sockel für Zerlegen und Sortieren plus Prüfarbeit C ≈ 2(k+1) · n · L/4^s, geteilt durch die Kerne. Im schlimmsten Fall landet alles in einem Seed, dann L · 2(k+1) · n Paare. Eigene Herleitung. | Folie 18, Backup 35 |
+| Was liefert Hadoop außer map() und reduce(), und wie funktioniert HDFS? | Verteiltes Dateisystem: Dateien in Blöcken, jeder Block dreimal, der NameNode kennt die Orte. Map-Tasks laufen dort, wo die Daten liegen. Ausgefallene Tasks startet Hadoop neu. | Backup 32 |
+| Was ist ein Combiner, und nutzt CloudBurst einen? | Ein Vorab-Reduce im Mapper, der Daten im Shuffle spart. CloudBurst nutzt ihn nur im Filter-Job (Top 2 pro Read). | Folie 12, Backup 33 |
+| Wie ist die Laufzeit des Algorithmus? | Sockel für Zerlegen und Sortieren plus Prüfarbeit C ≈ 2(k+1) · n · L/4^s, geteilt durch die Kerne. Im schlimmsten Fall landet alles in einem Seed, dann L · 2(k+1) · n Paare. Eigene Herleitung. | Folie 18, Backup 36 |
 | Welche anderen Seed-and-Extend-Verfahren gibt es? | Hashtabelle über Referenz (BLAST) oder Reads (RMAP), Spaced Seeds (SOAP, MAQ, ZOOM), Suffixbaum (MUMmer), BWT (Bowtie, BWA). | Backup 26 |
 
 ## Selbsttest
